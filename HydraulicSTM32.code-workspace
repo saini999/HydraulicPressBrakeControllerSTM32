@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"pinconfigured.h": "c",
+			"*.tcc": "cpp",
+			"optional": "cpp",
+			"functional": "cpp",
+			"random": "cpp",
+			"fstream": "cpp",
+			"istream": "cpp",
+			"ostream": "cpp",
+			"sstream": "cpp",
+			"streambuf": "cpp",
+			"compare": "cpp"
+		},
+		"arduino.clearOutputOnBuild": true,
+		"arduino.openPDEFiletype": true
+	}
+}
