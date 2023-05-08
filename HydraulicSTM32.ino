@@ -20,7 +20,7 @@
     #define getY2Angle mb.Hreg(1) //Angle set by HMI/Modbus Master GUI #00001 + 40001
     #define getY1AngleCorrection mb.Hreg(2) //AngleCorrection #00002 + 40001
     #define getY2AngleCorrection mb.Hreg(3) //AngleCorrection #00003 + 40001
-    #define getSheetThickness mb.Hreg(4) //Sheet Thickness #00004 + 40001
+    #define getSheetThicknessFromMb mb.Hreg(4) //Sheet Thickness #00004 + 40001
     #define getDyeWidth mb.Hreg(5) //V Dye Width #00005 + 40001
     #define setY1PosInmm(a) mb.Ireg(0, (int)floor(a)) //Update Y1 Position in MM to HMI #00000 + 30001
     #define setY2PosInmm(a) mb.Ireg(1, (int)floor(a)) //Update Y2 Position in MM #00001 + 30001
@@ -44,7 +44,7 @@
 //Define User Functions and import Required Libs
 #ifndef USR_FNC
     #define USR_FNC
-    #include <Encoder.h> 
+    #include <Encoder.h>
     #include <PositionGen.h>
     void handle_Y1Int();
     void handle_Y2Int();
@@ -121,8 +121,8 @@ void updatePositionGen(){
     Y2pos.setAngleCorrection(getY2AngleCorrection);
     Y1pos.setDye(getDyeWidth);
     Y2pos.setDye(getDyeWidth);
-    Y1pos.setSheetThickness(getSheetThickness);
-    Y2pos.setSheetThickness(getSheetThickness);
+    Y1pos.setSheetThickness(getSheetThicknessFromMb);
+    Y2pos.setSheetThickness(getSheetThicknessFromMb);
 }
 
 void setupEncoder() {
