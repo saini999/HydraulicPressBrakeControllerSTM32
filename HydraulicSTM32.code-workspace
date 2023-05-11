@@ -16,7 +16,12 @@
 			"ostream": "cpp",
 			"sstream": "cpp",
 			"streambuf": "cpp",
-			"compare": "cpp"
+			"compare": "cpp",
+			"exception": "cpp",
+			"iosfwd": "cpp",
+			"stdexcept": "cpp",
+			"system_error": "cpp",
+			"tuple": "cpp"
 		},
 		"arduino.clearOutputOnBuild": true,
 		"arduino.openPDEFiletype": true

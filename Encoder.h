@@ -26,6 +26,8 @@ class Encoder {
         mm getCorrection(void);
         //GetMovement in MM
         mm getPos(void);
+        //set Position
+        void setPos(mm pos);
     private:
         uint32_t _position;
         uint8_t _pinA;

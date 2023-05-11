@@ -14,4 +14,10 @@
     #define refY2Pin PB9
     #define footDwnpin PB10
     #define footUpPin PB12
+    #define y1dn PB13
+    #define y1up PB14
+    #define y2dn PB15
+    #define y2up PC0
+    #define pressurePin0 PC1
+    #define pressureENPin0 PC2
 #endif

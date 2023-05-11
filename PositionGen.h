@@ -1,10 +1,7 @@
 #ifndef PositionGen_h
 #define PositionGen_h
-#include <Arduino.h>
 
 typedef float mm, degree, rad;
-
-
 
 class PositionGen {
     public:

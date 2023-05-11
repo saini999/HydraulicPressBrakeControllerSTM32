@@ -1,6 +1,6 @@
 #ifndef IOController_h
     #define IOController_h
-    #include <Arduino.h>
+    #include <ModbusInit.h>
     #include <PinDefines.h>
     enum mstate {
         STATE_READY,
@@ -14,21 +14,27 @@
         MOVE_UP,
         NO_MOVE
     };
+    enum mode {
+        AUTO,
+        MANUAL,
+        IDLE,
+        REF
+    };
     mstate _mstate;
     movstate _movstate;
-    bool getEmergency(){
+    bool getEmergency0(){
         return !digitalRead(emgPin); //Assuming Emergency is set when pin reaches GND
     }
 
-    bool getReset(){
+    bool getReset0(){
         return digitalRead(resetPin);
     }
 
-    bool getStart(){
+    bool getStart0(){
         return digitalRead(startPin);
     }
 
-    bool getStop(){
+    bool getStop0(){
         return digitalRead(stopPin);
     }
 
@@ -43,17 +49,17 @@
     }
 
     mstate getState(){
-        if(getEmergency())
+        if(getEmergency0() || getEmergency)
         {
             _mstate = STATE_EMERGENCY;
             return STATE_EMERGENCY;
         } else
-        if((getStop() || getReset()) && !getEmergency())
+        if((getStop0() || getStop || getReset0() || getReset) && (!getEmergency0() || !getEmergency))
         {
             _mstate = STATE_READY;
             return STATE_READY;
         } else
-        if(getStart() && _mstate == STATE_READY)
+        if(getStart0() || getStart && _mstate == STATE_READY)
         {
             _mstate = STATE_RUNNING;
             return STATE_RUNNING;

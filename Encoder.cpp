@@ -38,6 +38,10 @@ mm Encoder::getPos(){
 	return (_position * _res) + _corr;
 }
 
+void Encoder::setPos(mm pos){
+	_position = pos / _res;
+}
+
 void Encoder::update(void) {
 		uint8_t s = _state & 3;
 		if (digitalRead(_pinA)) s |= 4;
