@@ -1,13 +1,14 @@
 #include <Encoder.h>
 
-Encoder::Encoder(uint8_t pinA, uint8_t pinB, callback_function_t callback){
+Encoder::Encoder(uint8_t pinA, uint8_t pinB/*, callback_function_t callback*/){
   _pinA = pinA;
   _pinB = pinB;
-  _callback = callback;
+  /*_callback = callback;
   pinMode(_pinA, INPUT);
   pinMode(_pinB, INPUT);
   attachInterrupt(_pinA, _callback, CHANGE);
   attachInterrupt(_pinB, _callback, CHANGE);
+  */
 }
 
 int32_t Encoder::read(){

@@ -9,7 +9,7 @@ typedef float mm;
 class Encoder {
     public:
         //Initialize Encoder with Pin A, Pin B and a callback function which calls update
-        Encoder(uint8_t pinA, uint8_t pinB, callback_function_t callback);
+        Encoder(uint8_t pinA, uint8_t pinB/*,callback_function_t callback*/);
         //Returns Current Encoder Position
         int32_t read(void);
         //Set Encoder Position
@@ -29,11 +29,11 @@ class Encoder {
         //set Position
         void setPos(mm pos);
     private:
-        uint32_t _position;
+        int32_t _position;
         uint8_t _pinA;
         uint8_t _pinB;
         uint8_t _state;
-        callback_function_t _callback;
+        //callback_function_t _callback;
         mm _res;
         mm _corr;
 };

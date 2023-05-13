@@ -1,6 +1,7 @@
 
 #include <PositionGen.h>
-
+#include <wiring_constants.h>
+#include <math.h>
 
 PositionGen::PositionGen(){
 

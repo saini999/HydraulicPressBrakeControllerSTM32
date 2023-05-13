@@ -37,8 +37,8 @@
          byte getSlaveId();
          void task();
          bool receive(byte* frame);
-         bool sendPDU(byte* pduframe);
-         bool send(byte* frame);
+         void sendPDU(byte* pduframe);
+         void send(byte* frame);
  
          bool config(HardwareSerial* port, long baud, int txPin);
  

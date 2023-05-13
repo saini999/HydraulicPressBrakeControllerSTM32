@@ -1,25 +1,5 @@
 #ifndef IOController_h
     #define IOController_h
-    #include <ModbusInit.h>
-    #include <PinDefines.h>
-    enum mstate {
-        STATE_READY,
-        STATE_RUNNING,
-        STATE_EMERGENCY,
-        STATE_ERROR
-    };
-
-    enum movstate {
-        MOVE_DOWN,
-        MOVE_UP,
-        NO_MOVE
-    };
-    enum mode {
-        AUTO,
-        MANUAL,
-        IDLE,
-        REF
-    };
     mstate _mstate;
     movstate _movstate;
     bool getEmergency0(){

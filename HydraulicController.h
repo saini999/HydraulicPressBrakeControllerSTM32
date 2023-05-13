@@ -1,8 +1,24 @@
 #ifndef HydraulicController_h
     #define HydraulicController_h
-    #include <IOController.h>
+    #include <Arduino.h>
+        enum mstate {
+        STATE_READY,
+        STATE_RUNNING,
+        STATE_EMERGENCY,
+        STATE_ERROR
+    };
 
-
+    enum movstate {
+        MOVE_DOWN,
+        MOVE_UP,
+        NO_MOVE
+    };
+    enum mode {
+        AUTO,
+        MANUAL,
+        IDLE,
+        REF
+    };
     class HydraulicController {
         public:
             HydraulicController(byte pinUp, byte pinDown, byte pressurePin, byte pressureENPin);
