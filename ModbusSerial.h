@@ -41,7 +41,7 @@
          void send(byte* frame);
  
          bool config(HardwareSerial* port, long baud, int txPin);
-         bool config(USBSerial* port, long baud, int txPin, bool a);
+         bool config(USBSerial* port, long baud, int txPin);
  
          #ifdef DEBUG_MODE
          bool config(HardwareSerial* port, HardwareSerial* DebugSerialPort, long baud, int txPin=-1);

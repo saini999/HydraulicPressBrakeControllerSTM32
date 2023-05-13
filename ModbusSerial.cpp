@@ -58,7 +58,7 @@
    return true;
  }
 
-  bool ModbusSerial::config(USBSerial* port, long baud, int txPin, bool a) {
+  bool ModbusSerial::config(USBSerial* port, long baud, int txPin) {
    this->_port = port;
    this->_txPin = txPin;
    (*port).begin(baud);

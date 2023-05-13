@@ -50,7 +50,7 @@
     #define setCustomPos mb.Coil(7)
 
     void setupModbus(){
-        mb.config(&Serial,9600, -1, false);
+        mb.config(&Serial,115200, -1);
         mb.setSlaveId(1);
         for (int i = 0; i < NUM_DISCRETE_INPUT; ++i) 
         {
@@ -319,8 +319,20 @@
         }
     }
 
+uint32_t t;
+bool led;
+
+void blink() {
+    if(millis() - t > 500){
+        digitalWrite(LED_D2, led);
+        led = !led;
+        t = millis();
+    }
+}
+
     void tasks(){
         mb.task();
+        blink();
         getCurrentPos();
         updateEncoderToHMI();
         updatePositionGen();
