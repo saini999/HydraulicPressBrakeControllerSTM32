@@ -2,10 +2,10 @@
     #define PinDef_h
 
     //Define Device I/O Pins
-    #define enc1a PB0
-    #define enc1b PB1
-    #define enc2a PB2
-    #define enc2b PB3
+    #define enc1a PE2
+    #define enc1b PE3
+    #define enc2a PE4
+    #define enc2b PE5
     #define resetPin PB4
     #define emgPin PB5
     #define startPin PB6

@@ -29,8 +29,45 @@
      pinMode(txPin, OUTPUT);
      digitalWrite(txPin, LOW);
    }
- 
+
    // Modbus states that a baud rate higher than 19200 must use a fixed 750 us
+   // for inter character time out and 1.75 ms for a frame delay for baud rates
+   // below 19200 the timing is more critical and has to be calculated.
+   // E.g. 9600 baud in a 11 bit packet is 9600/11 = 872 characters per second
+   // In milliseconds this will be 872 characters per 1000ms. So for 1 character
+   // 1000ms/872 characters is 1.14583ms per character and finally modbus states
+   // an inter-character must be 1.5T or 1.5 times longer than a character. Thus
+   // 1.5T = 1.14583ms * 1.5 = 1.71875ms. A frame delay is 3.5T.
+   // Thus the formula is T1.5(us) = (1000ms * 1000(us) * 1.5 * 11bits)/baud
+   // 1000ms * 1000(us) * 1.5 * 11bits = 16500000 can be calculated as a constant
+ 
+   if (baud > 19200)
+   _t15 = 750;
+   else
+   _t15 = 16500000/baud; // 1T * 1.5 = T1.5
+ 
+   /* The modbus definition of a frame delay is a waiting period of 3.5 character times
+   between packets. This is not quite the same as the frameDelay implemented in
+   this library but does benifit from it.
+   The frameDelay variable is mainly used to ensure that the last character is
+   transmitted without truncation. A value of 2 character times is chosen which
+   should suffice without holding the bus line high for too long.*/
+ 
+   _t35 = _t15 * 3.5;
+ 
+   return true;
+ }
+
+  bool ModbusSerial::config(USBSerial* port, long baud, int txPin, bool a) {
+   this->_port = port;
+   this->_txPin = txPin;
+   (*port).begin(baud);
+ 
+   if (txPin >= 0) {
+     pinMode(txPin, OUTPUT);
+     digitalWrite(txPin, LOW);
+   }
+      // Modbus states that a baud rate higher than 19200 must use a fixed 750 us
    // for inter character time out and 1.75 ms for a frame delay for baud rates
    // below 19200 the timing is more critical and has to be calculated.
    // E.g. 9600 baud in a 11 bit packet is 9600/11 = 872 characters per second
