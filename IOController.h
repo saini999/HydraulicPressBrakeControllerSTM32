@@ -2,6 +2,20 @@
     #define IOController_h
     mstate _mstate;
     movstate _movstate;
+    void setupIO() {
+        pinMode(LED_D2, OUTPUT);
+        pinMode(emgPin, INPUT);
+        pinMode(resetPin, INPUT);
+        pinMode(startPin, INPUT);
+        pinMode(stopPin, INPUT);
+        pinMode(footDwnpin, INPUT);
+        pinMode(footUpPin, INPUT);
+        pinMode(enc1a, INPUT_PULLUP);
+        pinMode(enc2a, INPUT_PULLUP);
+        pinMode(enc1b, INPUT_PULLUP);
+        pinMode(enc2b, INPUT_PULLUP);
+
+    }
     bool getEmergency0(){
         return !digitalRead(emgPin); //Assuming Emergency is set when pin reaches GND
     }

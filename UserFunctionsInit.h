@@ -276,10 +276,6 @@
     }
 
     void setupEncoder() {
-        pinMode(enc1a, INPUT_PULLUP);
-        pinMode(enc2a, INPUT_PULLUP);
-        pinMode(enc1b, INPUT_PULLUP);
-        pinMode(enc2b, INPUT_PULLUP);
         attachInterrupt(enc1a, handle_Y1Int, CHANGE);
         attachInterrupt(enc1b, handle_Y1Int, CHANGE);
         attachInterrupt(enc2a, handle_Y2Int, CHANGE);
@@ -343,6 +339,7 @@ void blink() {
 
     void setupTasks(){
         //Serial.begin(9600*8);
+        setupIO();
         setupModbus();
         setupEncoder();
     }
@@ -355,6 +352,10 @@ void blink() {
         machineState = getState();
         movestate = getMove();
         machineMode = getMode();
+        setEmergency(getEmergency0());
+        setStart(getStart0());
+        setStop(getStop0());
+        setReset(getReset0());
     }
     void refY1(){
         enc1.setPos(y1ref);
