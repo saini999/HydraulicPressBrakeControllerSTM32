@@ -50,7 +50,7 @@
     #define setCustomPos mb.Coil(7)
 
     void setupModbus(){
-        mb.config(&Serial,96008, -1, false);
+        mb.config(&Serial,9600, -1, false);
         mb.setSlaveId(1);
         for (int i = 0; i < NUM_DISCRETE_INPUT; ++i) 
         {
