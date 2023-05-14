@@ -13,24 +13,24 @@
     ModbusSerial mb;
     //Change Modbus Registers to Readable Variables
     #define getY1Angle mb.Hreg(0) //Angle set by HMI/Modbus Master GUI #00000 + 40001
-    #define getY2Angle mb.Hreg(1) //Angle set by HMI/Modbus Master GUI #00001 + 40001
-    #define getY1AngleCorrection mb.Hreg(2) //AngleCorrection #00002 + 40001
-    #define getY2AngleCorrection mb.Hreg(3) //AngleCorrection #00003 + 40001
-    #define getSheetThicknessFromMb mb.Hreg(4) //Sheet Thickness #00004 + 40001
-    #define getDyeWidth mb.Hreg(5) //V Dye Width #00005 + 40001
-    #define getSheetWidth mb.Hreg(6) //Get Sheet Width for Pressure Calc
-    #define getCustomY1PosInmm mb.Hreg(7)
-    #define getCustomY2PosInmm mb.Hreg(8)
-    #define getCustomY1PosInMicron mb.Hreg(9)
-    #define getCustomY2PosInMicron mb.Hreg(10)
-    #define getSoftLmt mb.Hreg(11)
+    #define getY2Angle mb.Hreg(2) //Angle set by HMI/Modbus Master GUI #00001 + 40001
+    #define getY1AngleCorrection mb.Hreg(4) //AngleCorrection #00002 + 40001
+    #define getY2AngleCorrection mb.Hreg(6) //AngleCorrection #00003 + 40001
+    #define getSheetThicknessFromMb mb.Hreg(8) //Sheet Thickness #00004 + 40001
+    #define getDyeWidth mb.Hreg(10) //V Dye Width #00005 + 40001
+    #define getSheetWidth mb.Hreg(12) //Get Sheet Width for Pressure Calc
+    #define getCustomY1PosInmm mb.Hreg(14)
+    #define getCustomY2PosInmm mb.Hreg(16)
+    #define getCustomY1PosInMicron mb.Hreg(18)
+    #define getCustomY2PosInMicron mb.Hreg(20)
+    #define getSoftLmt mb.Hreg(22)
     #define setY1PosInmm(a) mb.Ireg(0, (int)ceil(a)) //Update Y1 Position in MM to HMI #00000 + 30001
-    #define setY2PosInmm(a) mb.Ireg(1, (int)ceil(a)) //Update Y2 Position in MM #00001 + 30001
+    #define setY2PosInmm(a) mb.Ireg(2, (int)ceil(a)) //Update Y2 Position in MM #00001 + 30001
 
     //Updating Float Position by sending seprate MM and Micron as MM.Micron i.e 5.015
 
-    #define setY1PosInMicron(a) mb.Ireg(2, (int)((a - (int)a)*1000)) //Update Y2 Position in Microns #00002 + 30001
-    #define setY2PosInMicron(a) mb.Ireg(3, (int)((a - (int)a)*1000)) //Update Y2 Position in Microns #00003 + 30001
+    #define setY1PosInMicron(a) mb.Ireg(4, (int)((a - (int)a)*1000)) //Update Y2 Position in Microns #00002 + 30001
+    #define setY2PosInMicron(a) mb.Ireg(6, (int)((a - (int)a)*1000)) //Update Y2 Position in Microns #00003 + 30001
 
     //Coils
     #define getAutoMode mb.Coil(0) // if true Machine is in Auto Mode ------|
@@ -48,6 +48,10 @@
     #define getEmergency mb.Coil(6)
     #define setEmergency(a) mb.Coil(6, a)
     #define setCustomPos mb.Coil(7)
+    #define setSetCustomPos(a) mb.Coil(7, a)
+    #define setFootDN(a) mb.Coil(8, a)
+    #define setFootUP(a) mb.Coil(9, a)
+
 
     void setupModbus(){
         mb.config(&Serial,115200, -1);
@@ -77,7 +81,7 @@
     mode machineMode;
     mm softLimit;
     mm y1pos, y2pos;
-    mm maxUnbalance, minUnbalance;
+    mm maxUnbalance = 10, minUnbalance = 1;
     mm slowDownPos, uSlowDownPos1, uSlowDownPos2, slowUpPos1, slowUpPos2;
     void handle_Y1Int();
     void handle_Y2Int();
@@ -98,7 +102,6 @@
     //Init Position Encoders
     Encoder enc1(enc1a, enc1b/*, handle_Y1Int*/);
     Encoder enc2(enc2a, enc2b/*, handle_Y2Int*/);
-
     #define UFAST 200
     #define FAST 127
     #define SLOW 60
@@ -115,7 +118,7 @@
     }
 
     void setSoftLimit(){
-        softLimit = getSoftLmt;
+        softLimit = (int)getSoftLmt;
     }
 
     mm getSoftLimit(){
@@ -132,7 +135,9 @@
         int minSheetWidth = 2400;
         int maxThickness = 10;
         int minSheetThickness = 1;
-        float k = 255/(maxWidth*maxThickness);
+        volatile float k;
+        k = maxWidth * maxThickness;
+        k = 255.0 / k;
         sheetWidth = minSheetWidth > sheetWidth ? minSheetWidth : sheetWidth;
         sheetThickness = minSheetThickness > sheetThickness ? minSheetThickness : sheetThickness;
         return (uint8_t)(k*(sheetWidth*sheetThickness));
@@ -185,25 +190,65 @@
 
     void autoMoveTo(mm y1loc, mm y2loc, mm sheetWidth, mm sheetThickness, movstate movestate0){
         getCurrentPos();
-        uint8_t speed1, speed2;
-        uint8_t y1speed, y2speed;
-        bool isBendingSheet;
+        volatile uint8_t speed1, speed2;
+        volatile uint8_t y1speed, y2speed;
+        volatile bool isBendingSheet;
         if(movestate0 == MOVE_DOWN){
             slowDownPos = 1.5 * sheetThickness;
             uSlowDownPos1 = y1loc + (1.5*sheetThickness);
             uSlowDownPos2 = y2loc + (1.5*sheetThickness);
-            isBendingSheet = slowDownPos > y1loc || slowDownPos > y2loc ? true : false;
-            speed1 = slowDownPos > y1loc ? SLOW : FAST;
-            speed1 = uSlowDownPos1 > y1loc ? BEND : speed1;
-            speed2 = slowDownPos > y2loc ? SLOW : FAST;
-            speed2 = uSlowDownPos2 > y2loc ? BEND : speed2;
+            /*
+            isBendingSheet = (slowDownPos > y1pos) || (slowDownPos > y2pos) ? true : false;
+            speed1 = slowDownPos>y1pos? SLOW : FAST;
+            speed1 = uSlowDownPos1 > y1pos ? BEND : speed1;
+            speed2 = slowDownPos > y2pos ? SLOW : FAST;
+            speed2 = uSlowDownPos2 > y2pos ? BEND : speed2;
+            */
+            if((slowDownPos > y1pos) || (slowDownPos > y2pos)){
+                isBendingSheet = true;
+            } else {
+                isBendingSheet = false;
+            }
+            if(slowDownPos > y1pos){
+                speed1 = SLOW;
+            } else {
+                speed1 = FAST;
+            }
+            if(slowDownPos > y2pos){
+                speed2 = SLOW;
+            } else {
+                speed2 = FAST;
+            }
+            if(uSlowDownPos1 > y1pos){
+                speed1 = BEND;
+            } else {
+                //speed1 = speed1;
+            }
+            if(uSlowDownPos2 > y2pos){
+                speed2 = BEND;
+            } else {
+                //speed2 = speed2;
+            }
         } else if(movestate0 == MOVE_UP){
             slowUpPos1 = y1ref - slowup;
             slowUpPos2 = y2ref - slowup;
-            speed1 = slowUpPos1 < y1loc ? SLOW : FAST;
-            speed2 = slowUpPos2 < y2loc ? SLOW : FAST;
+            /*
+            speed1 = slowUpPos1 < y1pos ? SLOW : FAST;
+            speed2 = slowUpPos2 < y2pos ? SLOW : FAST;
+            */
+           if(slowUpPos1 < y1pos){
+            speed1 = SLOW;
+            } else {
+                speed1 = FAST;
+            }
+            if(slowUpPos2 < y2pos){
+                speed2 = SLOW;
+            } else {
+                speed2 = FAST;
+ 
+           }
         }
-        mm diff = difference(y1pos, y2pos); 
+       volatile mm diff = difference(y1pos, y2pos); 
         if(diff < 0) {
             mm tdiff = diff * -1;
             if(tdiff > maxUnbalance){
@@ -212,8 +257,8 @@
         } else if (diff > maxUnbalance) {
             setEmergency(true);
         }
-        float k1 = diff/(maxUnbalance/speed1); //50% of max analog Resolution
-        float k2 = diff/(maxUnbalance/speed2); //50% of max analog Resolution
+       volatile float k1 = diff/(maxUnbalance/speed1); //50% of max analog Resolution
+       volatile float k2 = diff/(maxUnbalance/speed2); //50% of max analog Resolution
         if(k1 < 0) {
             k1 = k1 * -1;
         }
@@ -286,14 +331,14 @@
     }
 
     void updatePositionGen(){
-        Y1pos.setAngle(getY1Angle);
-        Y2pos.setAngle(getY2Angle);
-        Y1pos.setAngleCorrection(getY1AngleCorrection);
-        Y2pos.setAngleCorrection(getY2AngleCorrection);
-        Y1pos.setDye(getDyeWidth);
-        Y2pos.setDye(getDyeWidth);
-        Y1pos.setSheetThickness(getSheetThicknessFromMb);
-        Y2pos.setSheetThickness(getSheetThicknessFromMb);
+        Y1pos.setAngle((int)getY1Angle);
+        Y2pos.setAngle((int)getY2Angle);
+        Y1pos.setAngleCorrection((int)getY1AngleCorrection);
+        Y2pos.setAngleCorrection((int)getY2AngleCorrection);
+        Y1pos.setDye((int)getDyeWidth);
+        Y2pos.setDye((int)getDyeWidth);
+        Y1pos.setSheetThickness((int)getSheetThicknessFromMb);
+        Y2pos.setSheetThickness((int)getSheetThicknessFromMb);
     }
 
     void updateEncoderToHMI() {
@@ -306,12 +351,13 @@
     void updateCustomPos() {
         if(setCustomPos){
             mm pos1, pos2;
-            pos1 = getCustomY1PosInmm;
-            pos1 = pos1 + (getCustomY1PosInMicron/1000.0);
+            pos1 = (int)getCustomY1PosInmm;
+            pos1 = pos1 + ((int)getCustomY1PosInMicron/1000.0);
             enc1.setPos(pos1);
-            pos2 = getCustomY2PosInmm;
-            pos2 = pos2 + (getCustomY2PosInMicron/1000.0);
+            pos2 = (int)getCustomY2PosInmm;
+            pos2 = pos2 + ((int)getCustomY2PosInMicron/1000.0);
             enc2.setPos(pos2);
+            setSetCustomPos(false);
         }
     }
 
@@ -356,6 +402,8 @@ void blink() {
         setStart(getStart0());
         setStop(getStop0());
         setReset(getReset0());
+        setFootDN(movestate == MOVE_DOWN ? 1 : 0);
+        setFootUP(movestate == MOVE_UP ? 1 : 0);
     }
     void refY1(){
         enc1.setPos(y1ref);

@@ -6,18 +6,18 @@
     #define enc1b PE3
     #define enc2a PE4
     #define enc2b PE5
-    #define resetPin PB4
-    #define emgPin PB5
-    #define startPin PB6
-    #define stopPin PB7
-    #define refY1Pin PB8
-    #define refY2Pin PB9
-    #define footDwnpin PB10
-    #define footUpPin PB12
-    #define y1dn PB13
-    #define y1up PB14
-    #define y2dn PB15
-    #define y2up PC0
-    #define pressurePin0 PC1
-    #define pressureENPin0 PC2
+    #define resetPin PD0
+    #define emgPin PD1
+    #define startPin PD2
+    #define stopPin PD3
+    #define refY1Pin PD6
+    #define refY2Pin PD7
+    #define footDwnpin PD4 
+    #define footUpPin PD5
+    #define y1dn PA0
+    #define y1up PA1
+    #define y2dn PA2
+    #define y2up PA3
+    #define pressurePin0 PA5
+    #define pressureENPin0 PA4
 #endif

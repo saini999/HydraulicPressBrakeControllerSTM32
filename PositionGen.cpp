@@ -50,5 +50,6 @@ mm PositionGen::getFinalPosition(){
     finalpos = finalpos * sin(_anglerad);
     finalpos = finalpos * -1;
     finalpos = finalpos + _thickness;
+    _finalPos = finalpos;
     return finalpos;
 }
