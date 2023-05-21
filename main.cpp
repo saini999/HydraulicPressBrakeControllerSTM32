@@ -45,10 +45,11 @@ extern "C" void SystemClock_Config(void)
   }
 }
 
+float abc;
 
 void setup(){
-    setupTasks();
+  setupTasks();
 }
 void loop(){
-    tasks();
+  tasks();
 }

@@ -1,6 +1,7 @@
 //Define User Functions and import Required Libs
 #ifndef USR_FNC
     #define USR_FNC
+    #include <ParameterManager.h>
     #include <PinDefines.h>
     #include <Encoder.h>
     #include <HydraulicController.h>
@@ -24,13 +25,13 @@
     #define getCustomY1PosInMicron mb.Hreg(18)
     #define getCustomY2PosInMicron mb.Hreg(20)
     #define getSoftLmt mb.Hreg(22)
-    #define setY1PosInmm(a) mb.Ireg(0, (int)ceil(a)) //Update Y1 Position in MM to HMI #00000 + 30001
-    #define setY2PosInmm(a) mb.Ireg(2, (int)ceil(a)) //Update Y2 Position in MM #00001 + 30001
+    #define setY1PosInmm(a) mb.Ireg(0, int(ceil(a))) //Update Y1 Position in MM to HMI #00000 + 30001
+    #define setY2PosInmm(a) mb.Ireg(2, int(ceil(a))) //Update Y2 Position in MM #00001 + 30001
 
     //Updating Float Position by sending seprate MM and Micron as MM.Micron i.e 5.015
 
-    #define setY1PosInMicron(a) mb.Ireg(4, (int)((a - (int)a)*1000)) //Update Y2 Position in Microns #00002 + 30001
-    #define setY2PosInMicron(a) mb.Ireg(6, (int)((a - (int)a)*1000)) //Update Y2 Position in Microns #00003 + 30001
+    #define setY1PosInMicron(a) mb.Ireg(4, int(((a - (int)a)*1000))) //Update Y2 Position in Microns #00002 + 30001
+    #define setY2PosInMicron(a) mb.Ireg(6, int(((a - (int)a)*1000))) //Update Y2 Position in Microns #00003 + 30001
 
     //Coils
     #define getAutoMode mb.Coil(0) // if true Machine is in Auto Mode ------|
@@ -350,12 +351,17 @@
 
     void updateCustomPos() {
         if(setCustomPos){
-            mm pos1, pos2;
-            pos1 = (int)getCustomY1PosInmm;
-            pos1 = pos1 + ((int)getCustomY1PosInMicron/1000.0);
+            volatile mm pos1, pos2;
+            volatile int16_t pos1int, pos2int;
+            pos1int = int(getCustomY1PosInmm);
+            pos1 = (float)pos1int;
+            pos1int = int(getCustomY1PosInMicron);
+            pos1 = pos1 + ((float)pos1int / 1000.0);
             enc1.setPos(pos1);
-            pos2 = (int)getCustomY2PosInmm;
-            pos2 = pos2 + ((int)getCustomY2PosInMicron/1000.0);
+            pos2int = int(getCustomY2PosInmm);
+            pos2 = pos2int;
+            pos2int = int(getCustomY2PosInMicron);
+            pos2 = pos2 + ((float)pos2int /1000.0);
             enc2.setPos(pos2);
             setSetCustomPos(false);
         }
@@ -385,6 +391,7 @@ void blink() {
 
     void setupTasks(){
         //Serial.begin(9600*8);
+        initParameters();
         setupIO();
         setupModbus();
         setupEncoder();
