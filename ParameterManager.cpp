@@ -17,14 +17,14 @@ void initParameters() {
 
 void loadDefaultParameters() {
     param = SD.open("PARAMETERS/PARAMETERS.TXT", FILE_WRITE);
-    parameter.starRunTime = 5.0;
+    parameter.starRunTime = 5.123;
     parameter.starToDeltaDelay = 0.150;
-    parameter.y1ref = 200;
-    parameter.y2ref = 200;
-    parameter.fastUpLimit = 150;
-    parameter.fastDownLimit = 20;
-    parameter.maxDiff = 10;
-    parameter.softLimit = 180;
+    parameter.y1ref = 200.0;
+    parameter.y2ref = 200.0;
+    parameter.fastUpLimit = 150.0;
+    parameter.fastDownLimit = 20.0;
+    parameter.maxDiff = 10.0;
+    parameter.softLimit = 180.0;
     String str;
     for(uint8_t i=0; i<8; i++){
         switch(i){
@@ -98,14 +98,10 @@ void updateParameters() {
 
 void loadParameters() {
     param = SD.open("PARAMETERS/PARAMETERS.TXT", FILE_READ);
-    uint8_t* buf;
-    param.read(buf, param.size());
-    String str = (const char*)buf;
-    String tstr;
-    int cur=0;
+    String str, tstr;
     for(uint8_t i = 0; i < 8; i++){
-        tstr = str.substring(cur, cur + 7);
-        cur += 9;
+        str = param.readStringUntil('\n');
+        tstr = str.substring(0, str.indexOf('\r'));
         switch(i) {
             case 0:
                 parameter.starRunTime = tstr.toFloat();
