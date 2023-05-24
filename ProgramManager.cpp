@@ -77,7 +77,7 @@ bool createNewProgram(){
     tstr += (String)temp;
     proglist.seek(0);
     do {str = proglist.readStringUntil('\n');}
-    while(str.indexOf(tstr) == -1)l
+    while(str.indexOf(tstr) == -1);
     }
     tstr = "P";
     sprintf(temp, "%03d", newprogid);
